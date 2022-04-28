@@ -1,0 +1,24 @@
+# depslib dependency file v1.0
+1651148722 source:c:\users\legion\desktop\并行计算技术\simd_parallel\main.cpp
+	<cstdio>
+	<pmmintrin.h>
+	<cstdlib>
+	<algorithm>
+	<windows.h>
+	<iostream>
+
+1651148619 source:c:\users\legion\desktop\并行计算技术\simd_parallel\src\timer.cpp
+	<windows.h>
+
+1651148619 source:c:\users\legion\desktop\并行计算技术\parallelhomework\simd_parallel\src\timer.cpp
+	<windows.h>
+
+1651149607 source:c:\users\legion\desktop\并行计算技术\parallelhomework\simd_parallel\main.cpp
+	<cstdio>
+	<pmmintrin.h>
+	<cstdlib>
+	<algorithm>
+	<windows.h>
+	<iostream>
+	<time.h>
+
