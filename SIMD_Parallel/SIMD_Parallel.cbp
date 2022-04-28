@@ -31,11 +31,11 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-march=corei7" />
 			<Add option="-Wall" />
 			<Add option="-fexceptions" />
 		</Compiler>
 		<Unit filename="main.cpp" />
-		<Unit filename="src/Timer.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>
