@@ -13,7 +13,7 @@
 1651148619 source:c:\users\legion\desktop\并行计算技术\parallelhomework\simd_parallel\src\timer.cpp
 	<windows.h>
 
-1651156294 source:c:\users\legion\desktop\并行计算技术\parallelhomework\simd_parallel\main.cpp
+1651224073 source:c:\users\legion\desktop\并行计算技术\parallelhomework\simd_parallel\main.cpp
 	<cstdio>
 	<pmmintrin.h>
 	<cstdlib>

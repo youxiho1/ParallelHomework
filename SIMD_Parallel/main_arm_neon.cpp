@@ -1,10 +1,11 @@
 #include <cstdio>
-#include <pmmintrin.h>
+#include <arm_neon.h>
 #include <cstdlib>
 #include <algorithm>
-#include <windows.h>
+#include <sys/time.h>
 #include <iostream>
 #include <time.h>
+#include <arm_neon.h>
 
 using namespace std;
 const int N = 10000;
@@ -16,32 +17,7 @@ int inputHeight, inputWidth, channels;
 int kernelHeight, kernelWidth;
 int outputHeight, outputWidth;
 
-class Timer
-{
-    public:
-        Timer(): start_(), end_() {}
-
-        void Start() {
-            QueryPerformanceCounter(&start_);
-        }
-
-        void Stop() {
-            QueryPerformanceCounter(&end_);
-        }
-
-        double GetElapsedMilliseconds() {
-            LARGE_INTEGER freq;
-            QueryPerformanceFrequency(&freq);
-            return (end_.QuadPart - start_.QuadPart) * 1000.0 / freq.QuadPart;
-        }
-
-
-    protected:
-
-    private:
-        LARGE_INTEGER start_;
-        LARGE_INTEGER end_;
-};
+struct timespec startT, endT;
 
 void readFromFile() {
      FILE *fp;
@@ -107,17 +83,18 @@ void conv() {
     }
 
     //Print
-    for(int i = 0; i < outputHeight; i++) {
+    /*for(int i = 0; i < outputHeight; i++) {
         for(int j = 0; j < outputWidth; j++) {
             printf("%.0f\t", result[i][j]);
 
         }
         putchar('\n');
-    }
+    }*/
 }
 
 void conv_simd() {
-    __m128 t1, t2, s;
+    float32x4_t t1, t2, s;
+    float32x2_t s1, s2;
     //Calculate
     outputHeight = inputHeight - kernelHeight + 1;
     outputWidth = inputWidth - kernelWidth + 1;
@@ -125,14 +102,14 @@ void conv_simd() {
     for(int i = 0; i < outputHeight; i++) {
         for(int j = 0; j < outputWidth; j++) {
             float temp = 0;
-            s = _mm_setzero_ps();
+            s = vdupq_n_f32(0.0);
             for(int c = 0; c < channels; c++) {
                 for(int k = 0; k < kernelHeight; k++) {         //kernelWidth
                     for(int t = kernelWidth - 4; t >= 0; t -= 4) {
-                        t1 = _mm_loadu_ps(input[c][i+k]+j+t);
-                        t2 = _mm_loadu_ps(kernel[c][k]+t);
-                        t1 = _mm_mul_ps(t1, t2);
-                        s = _mm_add_ps(s, t1);
+                        t1 = vld1q_f32(input[c][i+k]+j+t);
+                        t2 = vld1q_f32(kernel[c][k]+t);
+                        t1 = vmulq_f32(t1, t2);
+                        s = vaddq_f32(s, t1);
                     }
 
                     for(int t = (kernelWidth % 4) - 1; t >= 0; t--) {
@@ -140,9 +117,11 @@ void conv_simd() {
                     }
                 }
             }
-            s = _mm_hadd_ps(s, s);
-            s = _mm_hadd_ps(s, s);
-            _mm_store_ss(result[i]+j, s);
+	    s1 = vget_low_f32(s);
+	    s2 = vget_high_f32(s);
+	    s1 = vpadd_f32(s1, s2);
+	    s1 = vpadd_f32(s1, s1);
+	    vst1_lane_f32(result[i]+j, s1, 0);
             result[i][j] += temp;
         }
     }
@@ -161,23 +140,21 @@ void conv_simd() {
 
 int main() {
 
-    int args[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 5000, 10000};
-    for(int x = 0; x < 22; x++) {
-        int loops = 100;
+    int args[] = {100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 5000, 10000};
+    for(int x = 0; x < 12; x++) {
+        int loops = 1;
         channels = 1;
         inputHeight = inputWidth = args[x];
-        kernelHeight = kernelWidth = 4;
+        kernelHeight = kernelWidth = 64;
 
         //readFromFile();
         randInit();
-
-        Timer* timer = new Timer();
-        timer->Start();
+	clock_gettime(CLOCK_MONOTONIC, &startT);	
         for(int i = 0; i < loops; i++) {
             conv_simd();
         }
-        timer->Stop();
-        printf("%fms\n", timer->GetElapsedMilliseconds());
+	clock_gettime(CLOCK_MONOTONIC, &endT);
+	cout << (endT.tv_sec - startT.tv_sec) * 1000 + (endT.tv_nsec - startT.tv_nsec) / 1000000 << "ms" << endl;
     }
 
     return 0;

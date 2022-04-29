@@ -31,10 +31,13 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add option="-march=corei7" />
 			<Add option="-Wall" />
+			<Add option="-march=corei7" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Linker>
+			<Add option="-O2" />
+		</Linker>
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
