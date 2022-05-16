@@ -1,0 +1,12 @@
+# depslib dependency file v1.0
+1652603581 source:c:\users\legion\desktop\并行计算技术\parallelhomework\pthread\main.cpp
+	<cstdio>
+	<pmmintrin.h>
+	<cstdlib>
+	<algorithm>
+	<windows.h>
+	<iostream>
+	<time.h>
+	<immintrin.h>
+	<pthread.h>
+
