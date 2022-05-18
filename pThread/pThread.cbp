@@ -32,9 +32,15 @@
 			</Target>
 		</Build>
 		<Compiler>
+			<Add option="-O2" />
 			<Add option="-Wall" />
+			<Add option="-std=gnu++17" />
+			<Add option="-m64" />
 			<Add option="-fexceptions" />
 		</Compiler>
+		<Linker>
+			<Add option="-m64" />
+		</Linker>
 		<Unit filename="main.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
